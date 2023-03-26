@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>德科IC卡 | 身份证 阅读器Demo</title>
+    <style type="text/css">
+
+    </style>
+</head>
+
+<body>
+    <div>
+        <span>阅读器状态:</span>
+        <span id="read_status"></span>
+    </div>
+
+    <textarea id="read_text" placeholder="读取内容" rows="10" cols="50"></textarea>
+</body>
+<script type="text/javascript">
+    var statusElement = document.getElementById('read_status');
+    var textElement = document.getElementById('read_text');
+
+    var webSocket = new WebSocket("ws://127.0.0.1:9521");
+    webSocket.onopen = function () {
+        statusElement.innerHTML = "已连接";
+        // webSocket.send("3033A0FFFFFFFFFFFF0405060809");
+        setInterval(() => {
+            webSocket.send("23262326232623262326");
+        }, 500);
+    }
+    webSocket.onmessage = function (event) {
+        if (event && event.data) {
+            var data = event.data;
+            if (data == '未查询到设备' || data == 'window服务未启动' || data == '非有效身份证证件') {
+                statusElement.innerHTML = data;
+            } else if (data.substring(2, 10).toUpperCase() == "00636E81") {
+                statusElement.innerHTML = "请检查卡片是否放置在发卡器上";
+            } else if (isNaN(data) && typeof data !== 'number') {
+                textElement.innerHTML = data.toUpperCase();
+            }
+        }
+    };
+    webSocket.onclose = function () {
+        statusElement.innerHTML = "已断开";
+    }
+    webSocket.onerror = function () {
+        statusElement.innerHTML = "无法连接";
+    }
+
+    function stringToHex(str) {
+        var val = "";
+        for (var i = 0; i < str.length; i++) {
+            if (val == "")
+                val = str.charCodeAt(i).toString(16);
+            else
+                val += str.charCodeAt(i).toString(16);
+        }
+        return val;
+    }
+
+    function hexCharCodeToStr(hexCharCodeStr) {
+        var trimedStr = hexCharCodeStr.trim();
+        var rawStr =
+            trimedStr.substr(0, 2).toLowerCase() === "0x" ?
+            trimedStr.substr(2) :
+            trimedStr;
+        var len = rawStr.length;
+        if (len % 2 !== 0) {
+            alert("Illegal Format ASCII Code!");
+            return "";
+        }
+        var curCharCode;
+        var resultStr = [];
+        for (var i = 0; i < len; i = i + 2) {
+            curCharCode = parseInt(rawStr.substr(i, 2), 16); // ASCII Code Value
+            resultStr.push(String.fromCharCode(curCharCode));
+        }
+        return resultStr.join("");
+    }
+</script>
+
+</html>

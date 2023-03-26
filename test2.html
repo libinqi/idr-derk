@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>WebSocket测试</title>
+    <style>
+        .div1
+        {
+            height:auto;   
+            width:auto;
+            border:1px solid blue;
+            margin:auto;
+        }
+        h4
+        {
+            margin:auto;
+        }
+    </style>
+    <script>
+        var webSocket = {};
+		var actFlag="readIdCard";
+        //创建websockt
+        function CreateWebSocket() {
+            webSocket = new WebSocket("ws://127.0.0.1:9521");
+            webSocket.onopen = WebSokectOnOpen;
+            webSocket.onmessage = WebSocketOnMessage;
+            webSocket.onclose = WebSocketOnClose;
+        };
+
+        //建立连接事件
+        function WebSokectOnOpen() {
+            alert("已经打开连接！");
+			
+			WebSocketSendMsg('050063001402','data1');
+       // WebSocketSendMsg('#&#&#&#&#&','data1');
+        };
+
+        //监听事件
+        function WebSocketOnMessage(event) {
+            //监听来自客户端的数据
+          //  alert(event.data);
+		      //监听来自客户端的数据
+  //  alert(event.data);
+var aaaa=event.data;
+console.log(aaaa);
+
+ //  layer.alert(event.data);
+ if(aaaa=='未查询到设备'){
+alert(aaaa);
+ }else
+  if(aaaa=='window服务正常'){
+
+alert(aaaa);
+} 
+else
+if(aaaa=='window服务未启动'){
+alert(aaaa);
+}
+else
+if(aaaa=='非有效身份证证件'){
+alert(aaaa);
+}
+ else if(event.data.substring(2,10).toUpperCase()=="00636E81"){
+	alert("请检查卡片是否放置在发卡器上");
+ }else if(event.data.substring(2,12).toUpperCase()=="004290000A"){
+	alert("发卡成功");
+ }else if(actFlag=="readIdCard"&&isRealNum(aaaa)){
+	document.getElementById("pro").innerHTML=aaaa;
+ }else if(aaaa=="01"){
+ 
+	document.getElementById("proIc").innerHTML=aaaa;
+ }else if(aaaa=="02"){
+ 
+	document.getElementById("proIc").innerHTML=aaaa;
+ }
+ else if(aaaa=="03"){
+ 
+	document.getElementById("proIc").innerHTML=aaaa;
+ }
+ else if(aaaa=="04"){
+ 
+	document.getElementById("proIc").innerHTML=aaaa;
+ }else if(aaaa=="05"){
+ 
+	document.getElementById("proIc").innerHTML=aaaa;
+ }else if(actFlag=="readIc"){
+	
+
+	 	document.getElementById("readIc").innerHTML=hexCharCodeToStr(aaaa);
+	  
+ }else if(actFlag=="readIcNumbder"){
+	
+
+	 	document.getElementById("readIcNumbder").innerHTML=aaaa;
+	  
+ }else if(actFlag=="readIdCard"&&actFlag=="timeout"){
+	
+	alert("读身份证超时，请重试");
+	  
+ }else if(actFlag=="readIdCard"){
+  var obj = JSON.parse(aaaa);
+	         document.getElementById('imgId').src="data:image/png;base64,"+obj.pic;
+		 	document.getElementById("readIdCard").innerHTML=aaaa;
+	  
+ }
+        };
+
+        function WebSocketOnClose() {
+            //监听来自客户端的数据
+            alert('和服务器断开连接');
+        };
+
+         //发送事件
+        function WebSocketSendMsg(val,val2) {
+	if(val=="03006202"){
+	 actFlag="writeIc";
+	 val="N002021121311165820261030000000bccbde12Ohddshy0000000000000000000001            ";
+	}else if(val=="#&#&#&#&#&"){
+	 actFlag="readIdCard";
+	}
+console.log(val);
+//var aaa="#&#&#&#&#&";
+	if(actFlag!="readIdCard"){//ic卡操作 0A是秘钥类型 FFFFFFFFFFFF是16进制秘钥  28292A2C2D是5个连续的块。两个扇区顺序写入5个块
+ webSocket.send(stringToHex(val)+"A0FFFFFFFFFFFF0405060809");
+	}else{
+		 webSocket.send(stringToHex(val));
+      
+     }     
+        };
+     
+    </script>
+	<script type="text/javascript">
+
+	
+	/**
+*判断是否是数字
+*
+**/
+
+function isRealNum(val){
+    // isNaN()函数 把空串 空格 以及NUll 按照0来处理 所以先去除，    
+　　if(val === "" || val ==null){
+        return false;
+　　}
+   if(!isNaN(val)){　　　　
+　　//对于空数组和只有一个数值成员的数组或全是数字组成的字符串，isNaN返回false，例如：'123'、[]、[2]、['123'],isNaN返回false,   //所以如果不需要val包含这些特殊情况，则这个判断改写为if(!isNaN(val) && typeof val === 'number' )
+　　　 return true; 　　}　else{ 　　　　return false; 　　} }
+	
+function stringToHex(str){
+　　　　var val="";
+　　　　for(var i = 0; i < str.length; i++){
+　　　　　　if(val == "")
+　　　　　　　　val = str.charCodeAt(i).toString(16);
+　　　　　　else
+　　　　　　　　val +=  str.charCodeAt(i).toString(16);
+　　　　}
+　　　　return val;
+　　}
+function hexCharCodeToStr(hexCharCodeStr) {
+	　　var trimedStr = hexCharCodeStr.trim();
+	　　var rawStr = 
+	　　trimedStr.substr(0,2).toLowerCase() === "0x"
+	　　? 
+	　　trimedStr.substr(2) 
+	　　: 
+	　　trimedStr;
+	　　var len = rawStr.length;
+	　　if(len % 2 !== 0) {
+	　　　　alert("Illegal Format ASCII Code!");
+	　　　　return "";
+	　　}
+	　　var curCharCode;
+	　　var resultStr = [];
+	　　for(var i = 0; i < len;i = i + 2) {
+	　　　　curCharCode = parseInt(rawStr.substr(i, 2), 16); // ASCII Code Value
+	　　　　resultStr.push(String.fromCharCode(curCharCode));
+	　　}
+	　　return resultStr.join("");
+	}
+function initHid() {
+	isCanIc=false;
+	 webSocket.send("0000");
+}
+function TestServer() {
+	isCanIc=false;
+	 webSocket.send("0001");
+}
+function reServer() {
+	isCanIc=false;
+	 webSocket.send("0002");
+}
+      //读取卡片事件
+        function WebSocketSendMsgRead(val) {
+	
+			actFlag="readIc";
+					if(val=="03"){
+			actFlag="readIcNumbder";
+			}
+          webSocket.send(stringToHex(val)+"A0FFFFFFFFFFFF0405060809");
+        };
+</script>
+</head>
+<body onload="CreateWebSocket()">
+    <div class="div1">
+        <h4>当前读取身份证进度：</h4>
+        <h4 id="pro"></h4>
+       <h4>发IC卡进度：</h4>
+        <h4 id="proIc"></h4>
+        <input type="button" onclick="WebSocketSendMsg('#&#&#&#&#&','data1')"  value="读取身份证信息" />
+		  <input type="button" onclick="WebSocketSendMsg('#&#&#&','data1')"  value="读取身份证信息CDN" />
+		<input type="button" onclick="WebSocketSendMsg('03006202','data1')"  value="发IC卡" />
+		<input type="button" onclick="WebSocketSendMsgRead('01')"  value="读取IC卡内容" />
+			<input type="button" onclick="WebSocketSendMsgRead('03')"  value="读取IC卡号" />
+		 <input type="button" onclick="initHid()" value="初始化发卡器(热插拔情况下才可以点击一次)" />
+		  <input type="button" onclick="TestServer()" value="检测服务状态" />
+		  	  <input type="button" style="display:none;" onclick="reServer()" value="重启服务状态(可能是系统限制原因，无法直接重启服务)" />
+		  <h4>IC卡信息如下：</h4>
+        <h4 id="readIc"></h4>
+		  <h4>IC卡号如下：</h4>
+        <h4 id="readIcNumbder"></h4>
+			  <h4>身份证信息如下：</h4>
+        <h4 id="readIdCard"></h4>
+		<img src=""  id="imgId" style="width:100px;height:100px;"/>
+    </div>
+</body>
+ 
+</html>

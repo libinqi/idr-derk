@@ -1,0 +1,19 @@
+{
+  "name": "idr-derk",
+  "version": "1.0.0",
+  "description": "Derk iDR sdk for node addon",
+  "main": "index.js",
+  "scripts":{
+  },
+  "dependencies": {
+  },
+  "author": {
+    "email": "libinqi@outlook.com",
+    "name": "libinqi"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/libinqi/idr-derk.git"
+  }
+}
