@@ -1,6 +1,6 @@
 {
   "name": "idr-derk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Derk iDR sdk for node addon",
   "main": "index.js",
   "scripts":{
